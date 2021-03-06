@@ -3,10 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -22,23 +20,9 @@ type ExecCredentialStatus struct {
 }
 
 func main() {
-	logFileName := fmt.Sprintf("log-%s.txt", time.Now().Format(time.RFC3339Nano))
-	logFile, err := os.OpenFile(logFileName, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(1)
-	}
-	defer func() {
-		err2 := logFile.Close()
-		if err2 != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err)
-			os.Exit(1)
-		}
-	}()
-	log.SetOutput(logFile)
+	log.SetOutput(os.Stderr)
 	log.SetLevel(log.DebugLevel)
-	err = mainCore()
-	if err != nil {
+	if err := mainCore(); err != nil {
 		log.Fatal(err)
 	}
 }
